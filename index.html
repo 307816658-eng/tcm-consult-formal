@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>倪海厦经方辨证 · 中医智能问诊</title>
+<style>
+:root {
+  --ink:#1a0f0a;--ink-mid:#3d2b1f;--ink-l:#6b4c3b;
+  --paper:#faf6f0;--paper-d:#f0e8d8;--paper-dark:#e8dcc8;
+  --gold:#b8860b;--gold-l:#d4a843;--gold-d:#8b6508;
+  --red:#8b2500;--red-l:#a0522d;--red-dark:#5c1a00;
+  --green:#2d5a27;--green-l:#4a7c42;
+  --border:#c4a882;--border-l:#d4c4a8;
+  --shadow:0 2px 12px rgba(26,15,10,0.08);
+  --shadow-lg:0 8px 32px rgba(26,15,10,0.12);
+  --radius:12px;
+  --fs:"Noto Serif SC","STSong","SimSun","Songti SC",Georgia,serif;
+  --ft:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--ft);background:var(--paper);color:var(--ink);display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c4a882' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+
+/* 顶部 */
+.header{background:linear-gradient(135deg,var(--ink) 0%,var(--ink-mid) 60%,var(--ink-l) 100%);color:var(--paper);padding:16px 20px;text-align:center;position:relative;z-index:100;flex-shrink:0;border-bottom:3px solid var(--gold)}
+.header::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-l),transparent)}
+.header-icon{font-size:2rem;display:block;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))}
+.header h1{font-family:var(--fs);font-size:1.4rem;letter-spacing:0.15em;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
+.header .sub{font-size:0.75rem;opacity:0.75;margin-top:4px;letter-spacing:0.05em}
+
+.main-wrapper{flex:1;overflow:hidden;position:relative;z-index:1}
+
+/* 欢迎页 */
+#welcomeScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px 20px;text-align:center;animation:fadeIn 0.5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.w-seal{width:80px;height:80px;background:linear-gradient(135deg,var(--red),var(--red-l));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;box-shadow:var(--shadow-lg),inset 0 2px 4px rgba(255,255,255,0.2);margin-bottom:20px;position:relative}
+.w-seal::after{content:'';position:absolute;inset:-4px;border:2px solid var(--gold);border-radius:20px;opacity:0.5}
+
+.w-title{font-family:var(--fs);font-size:1.6rem;color:var(--ink);margin-bottom:8px;font-weight:700;letter-spacing:0.05em}
+.w-subtitle{font-size:0.85rem;color:var(--ink-l);margin-bottom:24px;line-height:1.6}
+
+.w-features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:400px;margin-bottom:32px}
+.fcard{background:#fff;border:1px solid var(--border-l);border-radius:var(--radius);padding:16px 8px;text-align:center;transition:all 0.25s ease;box-shadow:var(--shadow)}
+.fcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--gold)}
+.fcard .fi{font-size:1.5rem;margin-bottom:6px}
+.fcard .fl{font-size:0.72rem;color:var(--ink-l);font-family:var(--fs)}
+
+.btn-start{background:linear-gradient(135deg,var(--red) 0%,var(--red-l) 100%);color:#fff;border:none;border-radius:50px;padding:16px 56px;font-size:1.1rem;font-family:var(--fs);letter-spacing:0.15em;cursor:pointer;box-shadow:0 4px 20px rgba(139,37,0,0.35);transition:all 0.25s ease;position:relative;overflow:hidden}
+.btn-start::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s}
+.btn-start:hover::before{left:100%}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(139,37,0,0.45)}
+.btn-start:active{transform:translateY(0)}
+
+.disclaimer{text-align:center;font-size:0.7rem;color:var(--ink-l);margin-top:16px;max-width:320px;line-height:1.5;opacity:0.8}
+
+/* 聊天区 */
+#chatContainer{display:none;flex-direction:column;height:100%;animation:fadeIn 0.3s ease}
+#chatContainer.active{display:flex}
+
+.progress-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--border-l);font-size:0.78rem;color:var(--ink-l);flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.progress-label{white-space:nowrap;font-weight:500}
+.progress-dots{display:flex;gap:5px;flex:1;justify-content:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--paper-d);border:1px solid var(--border);transition:all 0.3s}
+.dot.active{background:var(--red);border-color:var(--red);transform:scale(1.2);box-shadow:0 0 0 2px rgba(139,37,0,0.2)}
+.dot.done{background:var(--green);border-color:var(--green)}
+.progress-step{margin-left:auto;font-size:0.72rem;color:var(--ink-l);white-space:nowrap}
+
+.messages{flex:1;overflow-y:auto;padding:16px 12px;scroll-behavior:smooth;background:linear-gradient(180deg,var(--paper) 0%,var(--paper-d) 100%)}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.msg{margin-bottom:16px;display:flex;gap:10px;animation:msgIn 0.3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.msg.bot .avatar{background:linear-gradient(135deg,var(--red),var(--red-l));color:#fff}
+.msg.user .avatar{background:linear-gradient(135deg,var(--green),var(--green-l));color:#fff}
+
+.bubble{max-width:82%;padding:12px 16px;border-radius:14px;line-height:1.7;font-size:0.92rem;word-wrap:break-word;white-space:pre-wrap}
+.msg.bot .bubble{background:#fff;border:1px solid var(--border-l);border-top-left-radius:4px;box-shadow:var(--shadow)}
+.msg.user .bubble{background:linear-gradient(135deg,var(--green),var(--green-l));color:#fff;border-top-right-radius:4px;box-shadow:0 2px 8px rgba(45,90,39,0.25)}
+
+/* ===== 中医诊断单样式 ===== */
+.diagnosis-sheet{background:#fffef9;border:2px solid var(--border);border-radius:4px;padding:0;position:relative;box-shadow:var(--shadow-lg);max-width:100%;font-family:var(--fs);line-height:1.8;font-size:0.88rem}
+.diagnosis-sheet::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red),var(--gold),var(--red));border-radius:2px 2px 0 0}
+.diagnosis-sheet .sheet-header{text-align:center;padding:14px 16px 10px;border-bottom:1px dashed var(--border);background:linear-gradient(180deg,rgba(184,134,11,0.06),transparent)}
+.diagnosis-sheet .sheet-title{font-size:1.15rem;font-weight:700;color:var(--red-dark);letter-spacing:0.2em;margin-bottom:4px}
+.diagnosis-sheet .sheet-sub{font-size:0.72rem;color:var(--ink-l);letter-spacing:0.1em}
+.diagnosis-sheet .sheet-body{padding:14px 16px}
+.diagnosis-sheet .sheet-section{margin-bottom:14px}
+.diagnosis-sheet .sheet-section:last-child{margin-bottom:0}
+.diagnosis-sheet .section-title{font-size:0.9rem;font-weight:700;color:var(--red);border-left:3px solid var(--red);padding-left:10px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.diagnosis-sheet .section-title .icon{font-size:1rem}
+.diagnosis-sheet table{width:100%;border-collapse:collapse;margin:6px 0;font-size:0.82rem}
+.diagnosis-sheet th,.diagnosis-sheet td{border:1px solid var(--border);padding:7px 10px;text-align:left}
+.diagnosis-sheet th{background:linear-gradient(135deg,rgba(184,134,11,0.12),rgba(184,134,11,0.05));font-weight:600;color:var(--red-dark);font-family:var(--fs)}
+.diagnosis-sheet td{color:var(--ink-mid)}
+.diagnosis-sheet .highlight{color:var(--red);font-weight:700}
+.diagnosis-sheet .green{color:var(--green);font-weight:600}
+.diagnosis-sheet .quote{background:rgba(184,134,11,0.08);border-left:3px solid var(--gold);padding:8px 12px;margin:8px 0;font-style:italic;color:var(--ink-l);font-size:0.84rem;line-height:1.6}
+.diagnosis-sheet ul,.diagnosis-sheet ol{padding-left:18px;margin:4px 0}
+.diagnosis-sheet li{margin-bottom:3px}
+.diagnosis-sheet .disclaimer-box{background:#fff8f0;border:1px solid var(--gold);border-radius:6px;padding:10px 14px;margin-top:12px;font-size:0.75rem;color:var(--ink-l);line-height:1.6}
+.diagnosis-sheet .disclaimer-box strong{color:var(--red)}
+.diagnosis-sheet .stamp{position:absolute;bottom:8px;right:12px;font-size:0.7rem;color:var(--red);opacity:0.5;font-family:var(--fs);writing-mode:vertical-rl;letter-spacing:2px}
+
+.typing-indicator{display:flex;gap:5px;padding:12px 16px;background:#fff;border:1px solid var(--border-l);border-radius:14px;border-top-left-radius:4px;width:fit-content;box-shadow:var(--shadow);align-items:center}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--border);animation:bounce 1.4s infinite}
+.typing-indicator span:nth-child(2){animation-delay:.2s}
+.typing-indicator span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+
+.quick-options{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px 46px}
+.quick-btn{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:8px 16px;font-size:0.85rem;cursor:pointer;transition:all 0.2s;color:var(--ink-mid);font-family:var(--ft);box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.quick-btn:hover{background:var(--red);color:#fff;border-color:var(--red);transform:translateY(-1px);box-shadow:0 4px 12px rgba(139,37,0,0.25)}
+.quick-btn:active{transform:translateY(0)}
+
+.input-bar{background:#fff;border-top:1px solid var(--border-l);padding:12px 16px;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,0.04)}
+.input-row{display:flex;gap:10px;align-items:flex-end}
+#userInput{flex:1;border:1.5px solid var(--border-l);border-radius:12px;padding:12px 14px;font-size:0.92rem;font-family:var(--ft);resize:none;background:var(--paper);color:var(--ink);max-height:100px;min-height:46px;line-height:1.5;transition:all 0.2s}
+#userInput:focus{outline:none;border-color:var(--red);background:#fff;box-shadow:0 0 0 3px rgba(139,37,0,0.08)}
+#userInput::placeholder{color:var(--ink-l);opacity:0.6}
+.send-btn{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--red),var(--red-l));color:#fff;border:none;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;box-shadow:0 2px 8px rgba(139,37,0,0.3)}
+.send-btn:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(139,37,0,0.4)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+.float-btn{position:fixed;background:#fff;border:1.5px solid var(--border-l);border-radius:24px;padding:8px 14px;font-size:0.78rem;cursor:pointer;color:var(--ink-mid);z-index:150;transition:all 0.25s;box-shadow:var(--shadow);display:flex;align-items:center;gap:5px;font-family:var(--ft);white-space:nowrap}
+.float-btn:hover{background:var(--red);color:#fff;border-color:var(--red);transform:translateY(-1px);box-shadow:0 4px 12px rgba(139,37,0,0.3)}
+.float-btn:active{transform:translateY(0)}
+#restartBtn{top:80px;right:16px}
+
+@keyframes modalIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+
+@media(max-width:600px){
+  .header{padding:14px 16px}
+  .header h1{font-size:1.2rem}
+  .w-title{font-size:1.4rem}
+  .w-features{grid-template-columns:repeat(2,1fr);gap:8px}
+  .fcard{padding:12px 6px}
+  .fcard .fi{font-size:1.3rem}
+  .btn-start{padding:14px 48px;font-size:1rem}
+  .bubble{max-width:88%;padding:10px 14px;font-size:0.88rem}
+  .quick-options{margin-left:46px}
+  .messages{padding:12px 8px}
+  .input-bar{padding:10px 12px}
+  #restartBtn{top:72px;right:12px;padding:7px 12px;font-size:0.74rem}
+  .diagnosis-sheet{font-size:0.82rem}
+  .diagnosis-sheet .sheet-body{padding:10px 12px}
+  .diagnosis-sheet table{font-size:0.76rem}
+  .diagnosis-sheet th,.diagnosis-sheet td{padding:5px 7px}
+}
+@media(min-height:800px) and (max-width:600px){
+  .w-seal{width:70px;height:70px;font-size:2.2rem}
+  .w-title{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-icon">☯️</span>
+  <h1>倪海厦经方辨证</h1>
+  <div class="sub">中医智能问诊 · 六经辨证 · 方证对应</div>
+</div>
+
+<div class="main-wrapper">
+  <div id="welcomeScreen">
+    <div class="w-seal">🏥</div>
+    <h2 class="w-title">中医智能辨证系统</h2>
+    <p class="w-subtitle">
+      基于倪海厦人纪《伤寒论》《金匮要略》辨证体系<br>
+      通过问答形式，为您提供中医辨证分析与调理建议
+    </p>
+    <div class="w-features">
+      <div class="fcard"><div class="fi">🔍</div><div class="fl">六经辨证</div></div>
+      <div class="fcard"><div class="fi">📋</div><div class="fl">方证对应</div></div>
+      <div class="fcard"><div class="fi">🌿</div><div class="fl">调理方案</div></div>
+      <div class="fcard"><div class="fi">📖</div><div class="fl">经方速查</div></div>
+    </div>
+    <button class="btn-start" onclick="startConsult()">开始问诊</button>
+    <p class="disclaimer">⚠️ 仅供中医学习参考，不替代专业医疗诊断。如有不适请前往正规医院就诊。</p>
+  </div>
+
+  <div id="chatContainer">
+    <div class="progress-bar">
+      <span class="progress-label">问诊进度</span>
+      <div class="progress-dots" id="progressDots"></div>
+      <span class="progress-step" id="progressText"></span>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-bar">
+      <div class="input-row">
+        <textarea id="userInput" placeholder="输入您的回答..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="float-btn" id="restartBtn" onclick="restartConsult()" style="display:none">🔄 重新问诊</button>
+
+<script>
+var DEFAULT_BASE = 'https://apihub.agnes-ai.cn/v1';
+var DEFAULT_MODEL = 'agnes-2.5-flash';
+var DEFAULT_KEY = 'sk-2b6Fyhw10BYJtJ14DkOhGGxhkBoMP0wI1qrD1YmNMQJFt7tu';
+
+var config = {
+  base: localStorage.getItem('tcm_api_base') || DEFAULT_BASE,
+  key: localStorage.getItem('tcm_api_key') || DEFAULT_KEY,
+  model: localStorage.getItem('tcm_model') || DEFAULT_MODEL
+};
+
+var conversationHistory = [];
+var currentStep = 0;
+var isProcessing = false;
+
+var QUESTIONS = [
+  { text: '您好！我是基于倪海厦经方体系的中医辨证助手。在开始之前，请问您怎么称呼？', replies: ['郭伟','老王','小李','张阿姨','陈老师'] },
+  { text: '请问您最近主要哪里不舒服？请详细描述一下症状。', replies: ['腿麻','耳鸣','失眠','胃痛','头痛','咳嗽','其他'] },
+  { text: '请问您的大便情况怎么样？每天排吗？成形吗？', replies: ['每天正常','每天但不成形','两天一次','经常便秘','腹泻'] },
+  { text: '那小便呢？颜色深吗？一天大概几次？有没有夜尿？', replies: ['正常淡黄','颜色深','夜尿多','尿频尿急','正常'] },
+  { text: '睡眠质量怎么样？几点睡？容易醒吗？多梦吗？', replies: ['一觉到天亮','容易醒','多梦','失眠','12点后睡'] },
+  { text: '您的手脚平时是偏凉还是偏热？怕冷还是怕热？', replies: ['手脚冰凉','手脚温热','怕冷','怕热','正常'] },
+  { text: '口渴吗？想喝热水还是冷水？', replies: ['不渴','想喝热水','想喝冷水','口干'] },
+  { text: '胃口怎么样？吃饭香吗？饭后胀不胀？', replies: ['正常','吃一点就胀','胃口不好','容易饿','正常'] },
+  { text: '最后，请补充一下您的症状细节（如麻木的具体位置、是否伴随其他不适、既往病史等）：', replies: ['无补充','有痛风史','腰也酸','失眠严重','头晕'] }
+];
+
+var STEP_LABELS = ['称呼','主诉','大便','小便','睡眠','寒热','口渴','胃口','细节','分析'];
+
+function init() {
+  loadConfig();
+  var ta = document.getElementById('userInput');
+  ta.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+}
+
+function loadConfig() {
+  document.getElementById('apiBase').value = config.base;
+  document.getElementById('apiKey').value = config.key;
+  document.getElementById('modelSelect').value = config.model;
+}
+
+function startConsult() {
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('chatContainer').style.display = 'flex';
+  document.getElementById('chatContainer').classList.add('active');
+  document.getElementById('restartBtn').style.display = 'flex';
+  currentStep = 0;
+  conversationHistory = [];
+  updateProgress();
+  askQuestion(0);
+}
+
+function restartConsult() {
+  if (!confirm('确定要重新开始问诊吗？当前对话记录将被清空。')) return;
+  document.getElementById('messages').innerHTML = '';
+  conversationHistory = [];
+  currentStep = 0;
+  updateProgress();
+  askQuestion(0);
+}
+
+function updateProgress() {
+  var dots = document.getElementById('progressDots');
+  var text = document.getElementById('progressText');
+  dots.innerHTML = '';
+  QUESTIONS.forEach(function(_, i) {
+    var dot = document.createElement('span');
+    dot.className = 'dot';
+    if (i < currentStep) dot.classList.add('done');
+    else if (i === currentStep) dot.classList.add('active');
+    dots.appendChild(dot);
+  });
+  var label = currentStep < QUESTIONS.length ? STEP_LABELS[currentStep] : '分析中';
+  text.textContent = label + ' ' + (currentStep + 1) + '/' + QUESTIONS.length;
+}
+
+function askQuestion(index) {
+  if (index >= QUESTIONS.length) { sendToAnalysis(); return; }
+  var q = QUESTIONS[index];
+  addBotMessage(q.text, q.replies, false);
+  currentStep = index;
+  updateProgress();
+}
+
+function addBotMessage(text, quickReplies, isHtml) {
+  var msgs = document.getElementById('messages');
+  var div = document.createElement('div');
+  div.className = 'msg bot';
+  var avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = '🩺';
+  var bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  if (isHtml) {
+    bubble.innerHTML = text;
+  } else {
+    bubble.textContent = text;
+  }
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+
+  if (quickReplies && quickReplies.length > 0) {
+    var opts = document.createElement('div');
+    opts.className = 'quick-options';
+    quickReplies.forEach(function(r) {
+      var btn = document.createElement('button');
+      btn.className = 'quick-btn';
+      btn.textContent = r;
+      btn.onclick = function() { handleQuickReply(r); };
+      opts.appendChild(btn);
+    });
+    msgs.appendChild(opts);
+  }
+
+  scrollToBottom();
+}
+
+function addUserMessage(text) {
+  var msgs = document.getElementById('messages');
+  var div = document.createElement('div');
+  div.className = 'msg user';
+  var avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = '👤';
+  var bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  scrollToBottom();
+}
+
+function showTyping() {
+  var msgs = document.getElementById('messages');
+  var div = document.createElement('div');
+  div.className = 'msg bot';
+  div.id = 'typingIndicator';
+  var avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = '🩺';
+  var bubble = document.createElement('div');
+  bubble.className = 'typing-indicator';
+  bubble.innerHTML = '<span></span><span></span><span></span>';
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  scrollToBottom();
+}
+
+function removeTyping() {
+  var el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function scrollToBottom() {
+  var msgs = document.getElementById('messages');
+  setTimeout(function() { msgs.scrollTop = msgs.scrollHeight; }, 50);
+}
+
+function sendMessage() {
+  if (isProcessing) return;
+  var input = document.getElementById('userInput');
+  var text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMessage(text);
+  processUserInput(text);
+}
+
+function handleQuickReply(text) {
+  if (isProcessing) return;
+  addUserMessage(text);
+  processUserInput(text);
+}
+
+async function processUserInput(text) {
+  // 双重防护：防止重复提交
+  if (isProcessing) return;
+  // 确保loading指示器只有一个
+  var existingIndicator = document.getElementById('typingIndicator');
+  if (existingIndicator) existingIndicator.remove();
+  
+  isProcessing = true;
+  document.getElementById('sendBtn').disabled = true;
+  conversationHistory.push({ role: 'user', content: text });
+  try {
+    if (currentStep < 0) {
+      await handleFreeDialogue(text);
+    } else if (currentStep < QUESTIONS.length - 1) {
+      await delay(400);
+      var ind = document.getElementById('typingIndicator');
+      if (ind) ind.remove();
+      currentStep++;
+      askQuestion(currentStep);
+    } else if (currentStep === QUESTIONS.length - 1) {
+      await delay(400);
+      var ind2 = document.getElementById('typingIndicator');
+      if (ind2) ind2.remove();
+      addBotMessage('感谢您的配合！我现在正在为您进行辨证分析，请稍候... ⏳', [], false);
+      await sendToAnalysis();
+    }
+  } catch (err) {
+    var ind3 = document.getElementById('typingIndicator');
+    if (ind3) ind3.remove();
+    addBotMessage('❌ 发生错误：' + err.message + '\n请稍后重试。', [], false);
+  }
+  isProcessing = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+async function sendToAnalysis() {
+  showTyping();
+  var systemPrompt = buildSystemPrompt();
+  var messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: '根据以上问诊信息，请为我进行详细的中医辨证分析，输出为古风中医诊断单格式。' }
+  ];
+  conversationHistory.forEach(function(m) { messages.push(m); });
+  var response = await callAPI(messages);
+  removeTyping();
+  // 将AI返回的markdown转换为诊断单HTML
+  var html = renderDiagnosisSheet(response);
+  addBotMessage(html, [], true);
+  // 进入自由对话模式
+  currentStep = -1;
+}
+// 自由对话模式处理
+async function handleFreeDialogue(userText) {
+  showTyping();
+  var freeDialoguePrompt = '你现在是一位和蔼的老中医，正在诊室里和病人聊天。病人刚做完一次中医问诊。\n\n【说话方式】\n- 就像面对面聊天，语气亲切自然，不要打官腔\n- 大白话解释医学知识，比如"你这呀，就是身体里的小火炉火不够旺了"\n- 每次只说一个重点，一两段话讲完\n- 多用"嗯""对""其实呢""说白了"开头\n- 像真医生一样关心："这个啊，平时少吃寒凉的，多泡泡脚就好了"\n\n【绝对不要】\n- 不要列1234点\n- 不要画表格\n- 不要分"一、二、三"\n- 不要说"根据以上信息""综上所述"\n\n只有患者明确说"帮我写个方子"时才输出结构化内容。';
+  var messages = [
+    { role: 'system', content: freeDialoguePrompt },
+    { role: 'user', content: userText }
+  ];
+  try {
+    var response = await callAPI(messages);
+  } catch (err) {
+    response = '抱歉，网络有点问题，请稍后再问。';
+  } finally {
+    removeTyping();
+  }
+  addBotMessage(response, [], false);
+}
+
+
+// 将Markdown文本渲染为古风诊断单HTML
+function renderDiagnosisSheet(md) {
+  var lines = md.split('\n');
+  var html = '<div class="diagnosis-sheet">';
+  
+  // 标题头
+  html += '<div class="sheet-header">';
+  html += '<div class="sheet-title">☯ 中医辨证诊断单 ☯</div>';
+  html += '<div class="sheet-sub">倪海厦经方体系 · 六经辨证 · 方证对应</div>';
+  html += '</div>';
+  
+  html += '<div class="sheet-body">';
+  
+  var inTable = false;
+  var tableRows = '';
+  var tableHeaders = [];
+  var inSection = false;
+  var sectionTitle = '';
+  
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) continue;
+    
+    // 跳过分隔线
+    if (line.match(/^---+$/)) continue;
+    
+    // 标题行
+    var h3Match = line.match(/^###\s+(.+)$/);
+    if (h3Match) {
+      // 关闭之前的表格
+      if (inTable) { html += '</table>'; inTable = false; }
+      var titleText = h3Match[1].replace(/[*_]/g, '');
+      var iconMap = {
+        '六经辨证': '🔍', '脏腑辨证': '🫀', '病机分析': '📜',
+        '方剂建议': '💊', '生活调理': '🌿', '免责声明': '⚠️',
+        '饮食调理': '🍲', '作息调理': '🛌', '运动调理': '🏃', '艾灸方案': '🔥'
+      };
+      var icon = '';
+      for (var k in iconMap) { if (titleText.indexOf(k) !== -1) { icon = iconMap[k]; break; } }
+      html += '<div class="sheet-section">';
+      html += '<div class="section-title"><span class="icon">' + (icon || '📌') + '</span> ' + escapeHtml(titleText) + '</div>';
+      inSection = true;
+      continue;
+    }
+    
+    // 表格行
+    if (line.charAt(0) === '|' && line.charAt(line.length - 1) === '|') {
+      var cells = line.split('|').filter(function(c) { return c.trim(); }).map(function(c) { return c.trim(); });
+      if (cells.length === 0) continue;
+      
+      // 分隔行
+      if (cells.every(function(c) { return /^[:\-]+$/.test(c); })) continue;
+      
+      if (!inTable) {
+        html += '<table>';
+        inTable = true;
+      }
+      
+      var rowTag = (tableHeaders.length === 0) ? 'th' : 'td';
+      var cellContent = '';
+      cells.forEach(function(cell) {
+        var formatted = formatCell(cell);
+        cellContent += '<' + rowTag + '>' + formatted + '</' + rowTag + '>';
+      });
+      
+      if (tableHeaders.length === 0) {
+        tableHeaders = cells;
+      }
+      html += '<tr>' + cellContent + '</tr>';
+      continue;
+    } else {
+      // 关闭表格
+      if (inTable) { html += '</table>'; inTable = false; }
+    }
+    
+    // 引用块
+    if (line.charAt(0) === '>') {
+      var quoteText = line.substring(1).trim();
+      html += '<div class="quote">' + formatInline(escapeHtml(quoteText)) + '</div>';
+      continue;
+    }
+    
+    // 普通段落 - 处理加粗
+    var formatted = formatInline(escapeHtml(line));
+    if (formatted) {
+      html += '<p style="margin:4px 0;">' + formatted + '</p>';
+    }
+  }
+  
+  if (inTable) { html += '</table>'; }
+  
+  // 免责声明单独处理
+  html += '<div class="disclaimer-box"><strong>⚠️ 免责声明</strong><br>本诊断基于您提供的症状信息，仅供参考学习之用，不能替代专业中医师的面诊。中医讲究"四诊合参"，需望闻问切后方可准确辨证处方。如有需要，请务必前往正规医疗机构，由执业中医师诊治。</div>';
+  
+  html += '<div class="stamp">倪师经方<br>辨证录</div>';
+  html += '</div></div>';
+  
+  return html;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatInline(text) {
+  // 加粗 **text**
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // 斜体 *text*
+  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  return text;
+}
+
+function formatCell(text) {
+  return formatInline(escapeHtml(text));
+}
+
+function buildSystemPrompt() {
+  return '你是一位精通倪海厦经方体系的中医辨证助手。\n\n你的任务：\n1. 根据用户提供的症状信息，进行六经辨证和脏腑辨证\n2. 给出详细的辨证分析报告\n3. 提供方剂建议（注明仅供参考，须面诊医师）\n4. 给出生活调理建议（饮食、作息、运动、艾灸穴位等）\n\n分析应遵循倪海厦的辨证思路：\n- 先辨六经（太阳、阳明、少阳、太阴、少阴、厥阴）\n- 再辨脏腑\n- 方证对应，有是证用是方\n- 强调扶阳思想\n- 关注"健康五大标准"（二便、睡眠、手足温度、口渴、胃口）\n\n⚠️ 输出格式要求（非常重要！）：\n你必须按照以下Markdown格式输出，这将直接渲染为古风中医诊断单：\n\n### 一、六经辨证\n用表格展示症状与六经归属的对应关系\n\n### 二、脏腑辨证\n用表格展示脏腑与证候的关系\n\n### 三、病机分析\n用引用块(>)展示倪师经典论述，用段落阐述分析\n\n### 四、方剂建议\n用表格展示方剂组成，注明剂量和功效，末尾加免责声明\n\n### 五、生活调理方案\n分饮食调理、作息调理、运动调理、艾灸方案几个小节\n每个小节用表格或列表展示\n\n要求：\n- 语言简洁专业，像经验丰富的老中医\n- 表格要规范，使用Markdown表格语法\n- 重点内容用**加粗**标注\n- 不说废话，不重复\n- 末尾必须添加免责声明';
+}
+
+async function callAPI(messages) {
+  var resp = await fetch(config.base + '/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + config.key
+    },
+    body: JSON.stringify({
+      model: config.model,
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 2500
+    })
+  });
+  if (!resp.ok) {
+    var err = await resp.text();
+    throw new Error('API请求失败 (' + resp.status + '): ' + err);
+  }
+  var data = await resp.json();
+  return data.choices[0].message.content;
+}
+
+function delay(ms) {
+  return new Promise(function(r) { setTimeout(r, ms); });
+}
+
+
+
+init();
+</script>
+</body>
+</html>
